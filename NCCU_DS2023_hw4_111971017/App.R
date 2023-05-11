@@ -1,56 +1,63 @@
 library(shiny)
-library(FactoMineR)
-library(factoextra)
 library(ggplot2)
+library(factoextra)
+library(FactoMineR)
 
-# Define UI for app that performs PCA and CA ----
-ui <- fluidPage(
-  
-  # App title ----
-  titlePanel("PCA and CA Analysis"),
-  
-  # Sidebar layout with input and output definitions ----
-  sidebarLayout(
-    
-    # Sidebar panel for inputs ----
-    sidebarPanel(
-      
-      # Input: Select for analysis type ----
-      selectInput(inputId = "analysis_type", label = "Select analysis type:",
-                  choices = c("PCA", "CA"))
-      
-    ),
-    
-    # Main panel for displaying outputs ----
-    mainPanel(
-      
-      # Output: Plot ----
-      plotOutput(outputId = "plot")
-      
-    )
+data(iris)
+
+# UI
+ui <- navbarPage(
+  title = "PCA and CA analysis",
+  tabPanel("PCA",
+           sidebarLayout(
+             sidebarPanel(
+               selectInput(inputId = "xcol", label = "X-axis", choices = names(iris)[-5]),
+               selectInput(inputId = "ycol", label = "Y-axis", choices = names(iris)[-5])
+             ),
+             mainPanel(
+               plotOutput(outputId = "pca_plot")
+             )
+           )
+  ),
+  tabPanel("CA",
+           sidebarPanel(
+             sliderInput(inputId = "k_value", label = "K-means Centers (k)", min = 1, max = 10, value = 2)
+           ),
+           mainPanel(
+             plotOutput(outputId = "ca_plot")
+           )
   )
 )
 
-# Define server logic required for PCA and CA ----
+# Server
 server <- function(input, output) {
   
-  # Perform PCA or CA based on user input ----
-  output$plot <- renderPlot({
-    
-    # Perform PCA if selected
-    if (input$analysis_type == "PCA") {
-      result <- PCA(iris[, -5], graph = FALSE)
-      factoextra::fviz_pca_ind(result, geom.ind = "point", col.ind = iris$Species)
-    }
-    
-    # Perform CA if selected
-    if (input$analysis_type == "CA") {
-      result <- CA(iris[, -5], graph = FALSE)
-      fviz_ca_row(result, geom.row = "point", col.row = iris$Species)
-    }
+  # PCA plot
+  output$pca_plot <- renderPlot({
+    validate(
+      need(input$xcol != input$ycol, "X-axis and Y-axis should not be the same variable.")
+    )
+    data <- iris[, -5]
+    result <- prcomp(data, scale. = TRUE)
+    xcol <- input$xcol
+    ycol <- input$ycol
+    plot <- fviz_pca_ind(result, geom = "point", 
+                         axes = c(which(colnames(data) == xcol), which(colnames(data) == ycol)), 
+                         col.ind = iris$Species)
+    print(plot)
   })
   
+  # CA plot
+  output$ca_plot <- renderPlot({
+    data <- iris[, -5]
+    result <- CA(data, graph = FALSE)
+    k_value <- input$k_value
+    result$kmeans <- k_value
+    plot <- factoextra::fviz_ca_row(result, geom = "point", kmeans = result$kmeans)
+    print(plot)
+  })
 }
 
-# Create Shiny app ----
-shinyApp(ui = ui, server = server)
+# Create Shiny app
+#shinyApp(ui = ui, server = server)
+shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
