@@ -2,7 +2,7 @@
 
 #### Name: 許瑋如
 #### Student ID: 111971017
-#### ShinyApps link: [<https://yourname.shinyapps.io/NCCU_DS2023_hw4_studentID/>]
+#### ShinyApps link: [https://wjh2023.shinyapps.io/NCCU_DS2023_hw4_111971017/]
 
 ## Description
 

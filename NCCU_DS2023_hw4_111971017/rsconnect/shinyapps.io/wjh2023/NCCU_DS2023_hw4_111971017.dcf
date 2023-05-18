@@ -5,9 +5,9 @@ account: wjh2023
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9053074
-bundleId: 7187842
+bundleId: 7233839
 url: https://wjh2023.shinyapps.io/NCCU_DS2023_hw4_111971017/
-when: 1683531418.44476
-lastSyncTime: 1683531418.44477
+when: 1684415970.04255
+lastSyncTime: 1684415970.04256
 asMultiple: FALSE
 asStatic: FALSE
